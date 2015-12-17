@@ -95,6 +95,7 @@ class Context2d: public Nan::ObjectWrap {
     static NAN_METHOD(SetFontFace);
 #endif
     static NAN_METHOD(SetFillColor);
+    static NAN_METHOD(SetFillRule);
     static NAN_METHOD(SetStrokeColor);
     static NAN_METHOD(SetFillPattern);
     static NAN_METHOD(SetStrokePattern);
@@ -119,6 +120,7 @@ class Context2d: public Nan::ObjectWrap {
     static NAN_GETTER(GetGlobalAlpha);
     static NAN_GETTER(GetShadowColor);
     static NAN_GETTER(GetFillColor);
+    static NAN_GETTER(GetFillRule);
     static NAN_GETTER(GetStrokeColor);
     static NAN_GETTER(GetMiterLimit);
     static NAN_GETTER(GetLineCap);

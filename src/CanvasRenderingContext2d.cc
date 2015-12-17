@@ -11,6 +11,7 @@
 #include <limits>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 #include "Canvas.h"
 #include "Point.h"
 #include "Image.h"
@@ -93,7 +94,6 @@ void state_assign_fontFamily(canvas_state_t *state, const char *str) {
 void
 Context2d::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE target) {
   Nan::HandleScope scope;
-
   // Constructor
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(Context2d::New);
   constructor.Reset(ctor);
@@ -102,6 +102,7 @@ Context2d::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE target) {
 
   // Prototype
   Local<ObjectTemplate> proto = ctor->PrototypeTemplate();
+  Nan::SetPrototypeMethod(ctor, "setFillRule", SetFillRule); 
   Nan::SetPrototypeMethod(ctor, "drawImage", DrawImage);
   Nan::SetPrototypeMethod(ctor, "putImageData", PutImageData);
   Nan::SetPrototypeMethod(ctor, "getImageData", GetImageData);
@@ -149,6 +150,7 @@ Context2d::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE target) {
   Nan::SetAccessor(proto, Nan::New("globalAlpha").ToLocalChecked(), GetGlobalAlpha, SetGlobalAlpha);
   Nan::SetAccessor(proto, Nan::New("shadowColor").ToLocalChecked(), GetShadowColor, SetShadowColor);
   Nan::SetAccessor(proto, Nan::New("fillColor").ToLocalChecked(), GetFillColor);
+  Nan::SetAccessor(proto, Nan::New("fillRule").ToLocalChecked(), GetFillRule);
   Nan::SetAccessor(proto, Nan::New("strokeColor").ToLocalChecked(), GetStrokeColor);
   Nan::SetAccessor(proto, Nan::New("miterLimit").ToLocalChecked(), GetMiterLimit, SetMiterLimit);
   Nan::SetAccessor(proto, Nan::New("lineWidth").ToLocalChecked(), GetLineWidth, SetLineWidth);
@@ -319,6 +321,7 @@ Context2d::fill(bool preserve) {
       : cairo_fill(_context);
   }
 }
+
 
 /*
  * Stroke and apply shadow.
@@ -785,6 +788,7 @@ NAN_METHOD(Context2d::GetImageData) {
 
   info.GetReturnValue().Set(instance);
 }
+
 
 /*
  * Draw image src image to the destination (context).
@@ -1487,6 +1491,36 @@ NAN_GETTER(Context2d::GetFillColor) {
   Context2d *context = Nan::ObjectWrap::Unwrap<Context2d>(info.This());
   rgba_to_string(context->state->fill, buf, sizeof(buf));
   info.GetReturnValue().Set(Nan::New<String>(buf).ToLocalChecked());
+}
+
+/*
+ * Set fill rule
+ */
+
+NAN_METHOD(Context2d::SetFillRule){
+  Context2d *context = Nan::ObjectWrap::Unwrap<Context2d>(info.This());
+  cairo_t *ctx = context->context();
+  String::Utf8Value str(info[0]);
+  if(0 == strcmp("evenodd", *str)){
+    cairo_set_fill_rule(ctx, CAIRO_FILL_RULE_EVEN_ODD);
+  }
+  if(0 == strcmp("nonzero", *str)){
+    cairo_set_fill_rule(ctx, CAIRO_FILL_RULE_WINDING);
+  }
+}
+
+
+
+/*
+ * Get fill rule
+ */
+
+NAN_GETTER(Context2d::GetFillRule){
+  Context2d *context = Nan::ObjectWrap::Unwrap<Context2d>(info.This());
+  cairo_t *ctx = context->context();
+
+  int fill_rule = cairo_get_fill_rule(ctx);
+  info.GetReturnValue().Set(fill_rule);
 }
 
 /*
