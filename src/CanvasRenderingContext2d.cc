@@ -322,6 +322,20 @@ Context2d::fill(bool preserve) {
   }
 }
 
+/*
+ * Fill and apply fill rule.
+ */
+
+void
+Context2d::setFillRule(const char *rule) {
+  if(0 == strcmp("evenodd", rule)){
+    cairo_set_fill_rule(_context, CAIRO_FILL_RULE_EVEN_ODD);
+  }
+  if(0 == strcmp("nonzero", rule)){
+    cairo_set_fill_rule(_context, CAIRO_FILL_RULE_WINDING);
+  }
+}
+
 
 /*
  * Stroke and apply shadow.
@@ -1715,6 +1729,8 @@ NAN_METHOD(Context2d::Clip) {
 
 NAN_METHOD(Context2d::Fill) {
   Context2d *context = Nan::ObjectWrap::Unwrap<Context2d>(info.This());
+  String::Utf8Value str(info[0]);
+  context->setFillRule(*str);
   context->fill(true);
 }
 
