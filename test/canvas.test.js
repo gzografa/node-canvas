@@ -725,4 +725,50 @@ describe('Canvas', function () {
       done(err);
     });
   });
+
+  it.only('Context2d#createEvenOddFill()', function () {
+    var canvas = new Canvas(20, 20)
+      , ctx = canvas.getContext('2d');
+
+    ctx.beginPath()
+
+    ctx.moveTo(0, 0);
+    ctx.lineTo(20, 0);
+    ctx.lineTo(20, 20);
+    ctx.lineTo(0, 20);
+    ctx.lineTo(0, 0);
+    ctx.closePath();
+
+    ctx.moveTo(10, 10);
+    ctx.lineTo(15, 10);
+    ctx.lineTo(15, 15);
+    ctx.lineTo(10, 15);
+    ctx.lineTo(10, 10);
+    ctx.closePath();
+
+    ctx.fillStyle = '#FF0000';
+    ctx.fillStyle = '#000000';
+
+    ctx.fill('evenodd');
+    ctx.stroke();
+
+    var imageData = ctx.getImageData(0,0,20,1);
+    console.log(imageData);
+    assert.equal(20, imageData.width);
+    assert.equal(1, imageData.height);
+    assert.equal(80, imageData.data.length);
+
+    // (0,0) white
+    assert.equal(255, imageData.data[0]);
+    assert.equal(255, imageData.data[1]);
+    assert.equal(255, imageData.data[2]);
+    assert.equal(255, imageData.data[3]);
+
+    // (20,0) black
+    var i = imageData.data.length-4;
+    assert.equal(0, imageData.data[i+0]);
+    assert.equal(0, imageData.data[i+1]);
+    assert.equal(0, imageData.data[i+2]);
+    assert.equal(255, imageData.data[i+3]);
+  });
 });

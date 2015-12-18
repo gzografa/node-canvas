@@ -1515,9 +1515,11 @@ NAN_METHOD(Context2d::SetFillRule){
   Context2d *context = Nan::ObjectWrap::Unwrap<Context2d>(info.This());
   cairo_t *ctx = context->context();
   String::Utf8Value str(info[0]);
+
   if(0 == strcmp("evenodd", *str)){
     cairo_set_fill_rule(ctx, CAIRO_FILL_RULE_EVEN_ODD);
   }
+
   if(0 == strcmp("nonzero", *str)){
     cairo_set_fill_rule(ctx, CAIRO_FILL_RULE_WINDING);
   }
